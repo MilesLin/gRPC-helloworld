@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials"
 	"log"
 	"time"
 	"trygrpc/pb"
@@ -13,8 +14,14 @@ const (
 )
 
 func main() {
+	// Create tls based credential.
+	creds, err := credentials.NewClientTLSFromFile("../cert.pem", "")
+	if err != nil {
+		log.Fatalf("failed to load credentials: %v", err)
+	}
+
 	// Set up a connection to the server.
-	conn, err := grpc.Dial(address, grpc.WithInsecure(), grpc.WithBlock())
+	conn, err := grpc.Dial(address, grpc.WithTransportCredentials(creds), grpc.WithBlock())
 	if err != nil {
 		log.Fatalf("did not connect: %v", err)
 	}
